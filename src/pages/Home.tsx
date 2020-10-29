@@ -1,5 +1,6 @@
 import React from 'react'
-import { Button, Container, createStyles, Grid, IconButton, makeStyles, Paper, InputBase, Typography, withStyles } from '@material-ui/core'
+import { Button, Container, createStyles, Grid, IconButton, makeStyles, Paper, Typography, withStyles, Hidden, TextareaAutosize, CircularProgress, Avatar, List, ListItemAvatar, ListItem, ListItemText, TextField, ListSubheader } from '@material-ui/core'
+import { Theme } from '@material-ui/core/styles'
 import { 
 	Twitter as TwitterIcon, 
 	Search as SearchIcon, 
@@ -7,13 +8,19 @@ import {
 	EmailOutlined as EmailIcon,
 	BookmarkBorderOutlined as BookmarkIcon,
 	ListAltOutlined as ListIcon,
-	PermIdentityOutlined as UserIcon
+	PermIdentityOutlined as UserIcon,
+	ImageOutlined as ImageOutlinedIcon,
+	EmojiEmotionsOutlined as EmojiIcon
 } from '@material-ui/icons'
 import { Tweet } from '../components/Tweet'
 
-const useHomeStyles = makeStyles( theme => ({
+const useHomeStyles = makeStyles((theme: Theme) => ({
 	container: {
 		minHeight: '101.25vh'
+	},
+	sticky: {
+		position: 'sticky',
+		top: 0,
 	},
 	sideMenuList: {
 		padding: 0,
@@ -30,7 +37,7 @@ const useHomeStyles = makeStyles( theme => ({
 			'& h6': {
 				marginLeft: theme.spacing(1.5),
 				fontSize: theme.spacing(2.75),
-				fontWeight: 700,
+				fontWeight: 600,
 			},
 			'&:hover': {
 				backgroundColor: 'rgba(29,161,242,.1)',
@@ -49,77 +56,200 @@ const useHomeStyles = makeStyles( theme => ({
 	},
 	block: {
 		padding: '1rem 1.25rem',
-		borderBottom: '1px solid rgba(0, 0, 0, 0.12)'
+		borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
 	},
+	pageTitle: {
+		zIndex: 1
+	},
+	tweetForm: {
+		display: 'flex',
+		flexDirection: 'column',
+		'& textarea': {
+			marginLeft: theme.spacing(1.5),
+			width: '100%',
+			height: '100%',
+			fontSize: 24,
+			fontFamily: 'Segoe UI',
+			border: 'none',
+			resize: 'none',
+			'&:focus': {
+				outline: 'none'
+			}
+		}
+	},
+	tweetFormText: {
+		display: 'flex',
+		marginBottom: theme.spacing(1.5)
+	},
+	tweetFormActions: {
+		display: 'flex',
+		alignItems: 'center'
+	},
+	tweetFormTextProgressBar: {
+		marginLeft: theme.spacing(.5),
+		marginRight: theme.spacing(2)
+	},
+	rightSide: {
+		paddingTop: 20,
+	}
 }))
 
-const SearchTextField = withStyles(() => createStyles({
-	input: {
-		height: 45,
-		padding: '0 1.5rem',
-		borderRadius: 30,
-		backgroundColor: '#E6ECF0'
+const SearchTextField = withStyles((theme: Theme) => createStyles({
+	root: {
+		'& .MuiOutlinedInput-root': {
+			borderRadius: 30,
+			backgroundColor: '#E6ECF0',
+			padding: 0,
+			paddingLeft: 15,
+			'&.Mui-focused': {
+				backgroundColor: '#fff',
+				'& fieldset': { borderWidth: 1, borderColor: theme.palette.primary.main },
+				'& svg path': { fill: theme.palette.primary.main }
+			}
+		}
 	}
-}))(InputBase)
+}))(TextField)
+
 
 export const Home: React.FC = (): React.ReactElement => {
-	const classes = useHomeStyles()
+	const classes: any = useHomeStyles()
+	const [text, setText] = React.useState<string>('')
+	const textLength: number = text.length
+	const textLimit: number = 280
+	const textLimitPercentage: number = Math.round((text.length / textLimit) * 100)
+
+	const handleChangeText = (e: React.FormEvent<HTMLTextAreaElement>): void => {
+		if (e.currentTarget) setText(e.currentTarget.value)
+	}
+	const handleAddTweet = (): void => {
+		setText('')
+	}
 
 	return (
 		<Container maxWidth="lg">
 			<Grid className={classes.container} container spacing={4}>
 				<Grid item xs={1} lg={3}>
-					<ul className={classes.sideMenuList}>
+					<ul className={`${classes.sticky} ${classes.sideMenuList}`}>
 						<IconButton color="primary">
 							<TwitterIcon style={{ fontSize: 36 }} />
 						</IconButton>
 						<li>
 							<SearchIcon />
-							<Typography variant="h6">Поиск</Typography>
+							<Hidden smDown>
+								<Typography variant="h6">Поиск</Typography>
+							</Hidden>
 						</li>
 						<li>
 							<NotificationIcon />
-							<Typography variant="h6">Уведомления</Typography>
+							<Hidden smDown>
+								<Typography variant="h6">Уведомления</Typography>
+							</Hidden>
 						</li>
 						<li>
 							<EmailIcon />
-							<Typography variant="h6">Сообщения</Typography>
+							<Hidden smDown>
+								<Typography variant="h6">Сообщения</Typography>
+							</Hidden>
 						</li>
 						<li>
 							<BookmarkIcon />
-							<Typography variant="h6">Закладки</Typography>
+							<Hidden smDown>
+								<Typography variant="h6">Закладки</Typography>
+							</Hidden>
 						</li>
 						<li>
 							<ListIcon />
-							<Typography variant="h6">Список</Typography>
+							<Hidden smDown>
+								<Typography variant="h6">Список</Typography>
+							</Hidden>
 						</li>
 						<li>
 							<UserIcon />
-							<Typography variant="h6">Профиль</Typography>
-						</li>
-						<li>
-							<Button variant="contained" color="primary" style={{ padding: '1.75rem 0' }} fullWidth>Твитнуть</Button>
+							<Hidden smDown>
+								<Typography variant="h6">Профиль</Typography>
+							</Hidden>
 						</li>
 					</ul>
 				</Grid>
 				<Grid className={classes.feed} item xs={7} lg={6}>
 					<Paper variant="outlined" style={{ height: '100%' }} square>
-						<Paper className={classes.block} square>
+						<Paper className={`${classes.sticky} ${classes.block} ${classes.pageTitle}`} square>
 							<Typography variant="h6">Главная</Typography>
 						</Paper>
 
-						<Tweet 
-							user={{ 
-								name: 'Glafira Zhur', 
-								login: 'glafirazhur', 
-								avatar: 'https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg' 
-							}} 
-							text="Это тестовый текст для твита" 
-						/>
+						<Paper className={`${classes.block} ${classes.tweetForm}`}>
+							<div className={classes.tweetFormText}>
+								<Avatar src="https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg" />
+								<TextareaAutosize placeholder="Что происходит?" value={text} onChange={handleChangeText} />
+							</div>
+							<div className={classes.tweetFormActions}>
+								<IconButton color="primary">
+									<ImageOutlinedIcon />
+								</IconButton>
+								<IconButton color="primary" style={{ marginRight: 'auto' }}>
+									<EmojiIcon />
+								</IconButton>
+
+								{text && (
+									<>
+										<span>{`${textLength} / ${textLimit}`}</span>
+										<CircularProgress 
+											className={classes.tweetFormTextProgressBar} 
+											variant="static" 
+											size={20} thickness={5} 
+											value={textLength >= textLimit ? 100 : textLimitPercentage}
+											style={ textLength >= textLimit ? { color: 'red' } : undefined }
+										/>
+									</>
+								)}
+								<Button onClick={handleAddTweet} disabled={textLength >= textLimit} color="primary" variant="contained">Твитнуть</Button>
+							</div>
+						</Paper>
+						
+						{[
+							...new Array(15).fill(
+								<Tweet 
+									user={{ 
+										name: 'Glafira Zhur', 
+										login: 'glafirazhur', 
+										avatar: 'https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg'
+									}} 
+									text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo velit odit labore officiis ut, deleniti doloribus explicabo aut cum nobis. Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo velit odit labore officiis ut."
+								/>
+							)
+						]}
 					</Paper>
 				</Grid>
 				<Grid item xs={4} lg={3}>
-					<SearchTextField placeholder="Поиск в Твиттер" fullWidth />
+					<div className={`${classes.sticky} ${classes.rightSide}`}>
+						<SearchTextField 
+							variant="outlined" 
+							placeholder="Поиск в Твиттер"
+							fullWidth
+						/>
+						<List
+							subheader={
+								<ListSubheader component="div">
+									Кого читать
+								</ListSubheader>
+							}
+						>
+							{[...new Array(5).fill(
+								<ListItem button divider>
+									<ListItemAvatar>
+										<Avatar src="https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg" />
+									</ListItemAvatar>
+									<ListItemText 
+										primary="Dock of Shame"
+										secondary={
+											<Typography component="span" variant="body2">@FavDockOfShame</Typography>
+										}
+									/>
+								</ListItem>
+							)]}
+							<Typography>Показать еще</Typography>
+						</List>
+					</div>
 				</Grid>
 			</Grid>
 		</Container>
