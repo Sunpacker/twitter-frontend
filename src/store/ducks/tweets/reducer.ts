@@ -1,24 +1,31 @@
 import produce, { Draft } from 'immer'
 import { TweetActions, TweetActionsTypes } from './actionCreators'
-
-import { LoadingState, Tweets } from './state'
+import { Status, Tweets } from './state'
 
 
 const initialTweets: Tweets = {
 	items: [],
-	status: LoadingState.NEVER
+	status: Status.NEVER
 }
 
 
 export const tweetsReducer = produce((draft: Draft<Tweets>, action: TweetActions) => {
-	const { type, payload } = action
-
-	switch(type) {
+	switch(action.type) {
 		case TweetActionsTypes.SET_TWEETS:
-			draft.items = payload
+			draft.items = action.payload
+			draft.status = Status.LOADED
 			break
-		// case TweetActionsTypes.SET_TWEETS:
-		// 	draft.items = payload
-		// 	break
+			
+		case TweetActionsTypes.FETCH_TWEETS:
+			draft.items = []
+			draft.status = Status.LOADING
+			break
+			
+		case TweetActionsTypes.SET_STATUS:
+			draft.status = action.payload
+			break
+
+		default:
+			break
 	}
 }, initialTweets)

@@ -1,4 +1,6 @@
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { Button, Container, createStyles, Grid, IconButton, makeStyles, Paper, Typography, withStyles, Hidden, TextareaAutosize, CircularProgress, Avatar, List, ListItemAvatar, ListItem, ListItemText, TextField, ListSubheader } from '@material-ui/core'
 import { Theme } from '@material-ui/core/styles'
 import { 
@@ -12,7 +14,10 @@ import {
 	ImageOutlined as ImageOutlinedIcon,
 	EmojiEmotionsOutlined as EmojiIcon
 } from '@material-ui/icons'
+
 import { Tweet } from '../components/Tweet'
+import { fetchTweets } from '../store/ducks/tweets/saga'
+import { selectIsTweetsLoading, selectTweets } from '../store/ducks/tweets/selectors'
 
 const useHomeStyles = makeStyles((theme: Theme) => ({
 	container: {
@@ -118,12 +123,16 @@ export const Home: React.FC = (): React.ReactElement => {
 	const textLimit: number = 280
 	const textLimitPercentage: number = Math.round((text.length / textLimit) * 100)
 
-	const handleChangeText = (e: React.FormEvent<HTMLTextAreaElement>): void => {
-		if (e.currentTarget) setText(e.currentTarget.value)
-	}
-	const handleAddTweet = (): void => {
-		setText('')
-	}
+	const handleChangeText = (e: React.FormEvent<HTMLTextAreaElement>): void => e.currentTarget ? setText(e.currentTarget.value) : undefined
+	const handleAddTweet = (): void => setText('')
+
+	const tweets = useSelector(selectTweets).items
+	const isLoading = useSelector(selectIsTweetsLoading)
+	const dispatch = useDispatch()
+
+	React.useEffect(() => {
+		dispatch(fetchTweets())
+	}, [dispatch])
 
 	return (
 		<Container maxWidth="lg">
@@ -171,6 +180,7 @@ export const Home: React.FC = (): React.ReactElement => {
 						</li>
 					</ul>
 				</Grid>
+
 				<Grid className={classes.feed} item xs={7} lg={6}>
 					<Paper variant="outlined" style={{ height: '100%' }} square>
 						<Paper className={`${classes.sticky} ${classes.block} ${classes.pageTitle}`} square>
@@ -206,20 +216,12 @@ export const Home: React.FC = (): React.ReactElement => {
 							</div>
 						</Paper>
 						
-						{[
-							...new Array(15).fill(
-								<Tweet 
-									user={{ 
-										name: 'Glafira Zhur', 
-										login: 'glafirazhur', 
-										avatar: 'https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg'
-									}} 
-									text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo velit odit labore officiis ut, deleniti doloribus explicabo aut cum nobis. Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo velit odit labore officiis ut."
-								/>
-							)
-						]}
+						{isLoading ? <CircularProgress /> : (
+							tweets.map( tweet => <Tweet user={tweet.user} text={tweet.text} key={tweet._id} /> )
+						)}
 					</Paper>
 				</Grid>
+
 				<Grid item xs={4} lg={3}>
 					<div className={`${classes.sticky} ${classes.rightSide}`}>
 						<SearchTextField 
