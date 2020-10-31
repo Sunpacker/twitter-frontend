@@ -5,17 +5,17 @@ export enum Status {
 	NEVER = 'NEVER'
 }
 
-export interface Tweet {
-	_id: string;
+export interface ITweet {
+	_id?: string;
 	text: string;
 	user: {
-		name: string;
-		login: string;
-		avatar: string;
+		fullname: string;
+		username: string;
+		avatarUrl: string;
 	}
 }
 
-export interface Tweets {
-	items: Tweet[];
+export interface ITweets {
+	items: ITweet[];
 	status: Status;
 }

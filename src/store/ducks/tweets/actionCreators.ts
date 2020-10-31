@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Status, Tweets } from './state'
+import { Status, ITweets } from './state'
 
 
 export enum TweetActionsTypes {
@@ -10,7 +10,7 @@ export enum TweetActionsTypes {
 
 interface ISetTweetActions extends Action<TweetActionsTypes> {
 	type: TweetActionsTypes.SET_TWEETS
-	payload: Tweets['items']
+	payload: ITweets['items']
 }
 interface ISetTweetStatus extends Action<TweetActionsTypes> {
 	type: TweetActionsTypes.SET_STATUS

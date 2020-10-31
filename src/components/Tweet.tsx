@@ -7,6 +7,7 @@ import {
 	ReplyOutlined as ShareIcon
 } from '@material-ui/icons'
 import { grey } from '@material-ui/core/colors'
+import { ITweet } from '../store/ducks/tweets/state'
 
 const useHomeStyles = makeStyles( theme => ({
 	block: {
@@ -33,28 +34,19 @@ const useHomeStyles = makeStyles( theme => ({
 	}
 }))
 
-interface Tweet {
-	user: {
-		name: string;
-		login: string;
-		avatar: string;
-	};
-	text: string;
-}
-
-export const Tweet: React.FC<Tweet> = ({ user, text }: Tweet): React.ReactElement => {
+export const Tweet: React.FC<ITweet> = ({ user, text }: ITweet): React.ReactElement => {
 	const classes = useHomeStyles()
 
 	return (
 		<Paper className={`${classes.block} ${classes.tweet}`} square>
 			<Grid container spacing={3}>
 				<Grid item xs={1}>
-					<Avatar src={user.avatar} />
+					<Avatar src={user.avatarUrl} />
 				</Grid>
 				<Grid item xs={11}>
 					<Typography>
-						<b>{user.name}</b>
-						<span className={classes.tweetAuthor}>@{user.login} - 1ч.</span>
+						<b>{user.fullname}</b>
+						<span className={classes.tweetAuthor}>@{user.username} - 1ч.</span>
 					</Typography>
 					<Typography variant="body1">{text}</Typography>
 				</Grid>

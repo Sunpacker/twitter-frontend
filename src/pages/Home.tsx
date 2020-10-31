@@ -15,8 +15,9 @@ import {
 	EmojiEmotionsOutlined as EmojiIcon
 } from '@material-ui/icons'
 
+import { ITweet } from '../store/ducks/tweets/state'
 import { Tweet } from '../components/Tweet'
-import { fetchTweets } from '../store/ducks/tweets/saga'
+import { fetchTweets } from '../store/ducks/tweets/actionCreators'
 import { selectIsTweetsLoading, selectTweets } from '../store/ducks/tweets/selectors'
 
 const useHomeStyles = makeStyles((theme: Theme) => ({
@@ -217,7 +218,7 @@ export const Home: React.FC = (): React.ReactElement => {
 						</Paper>
 						
 						{isLoading ? <CircularProgress /> : (
-							tweets.map( tweet => <Tweet user={tweet.user} text={tweet.text} key={tweet._id} /> )
+							tweets.map( (tweet: ITweet) => <Tweet user={tweet.user} text={tweet.text} key={tweet._id} /> )
 						)}
 					</Paper>
 				</Grid>
@@ -236,19 +237,17 @@ export const Home: React.FC = (): React.ReactElement => {
 								</ListSubheader>
 							}
 						>
-							{[...new Array(5).fill(
-								<ListItem button divider>
-									<ListItemAvatar>
-										<Avatar src="https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg" />
-									</ListItemAvatar>
-									<ListItemText 
-										primary="Dock of Shame"
-										secondary={
-											<Typography component="span" variant="body2">@FavDockOfShame</Typography>
-										}
-									/>
-								</ListItem>
-							)]}
+							<ListItem button divider>
+								<ListItemAvatar>
+									<Avatar src="https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg" />
+								</ListItemAvatar>
+								<ListItemText 
+									primary="Dock of Shame"
+									secondary={
+										<Typography component="span" variant="body2">@FavDockOfShame</Typography>
+									}
+								/>
+							</ListItem>
 							<Typography>Показать еще</Typography>
 						</List>
 					</div>

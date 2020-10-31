@@ -5,8 +5,8 @@ import { Status } from './state'
 
 export function* fetchTweets() {
    try {
-		 const data = yield call(TweetsApi.fetchTweets)
-		 yield put(setTweets(data))
+		 const payload = yield call(TweetsApi.fetchTweets)
+		 yield put(setTweets(payload))
    } catch (e) {
 		 yield put(setTweetsStatus(Status.ERROR))
    }
