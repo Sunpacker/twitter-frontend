@@ -8,13 +8,13 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import App from './App'
 import { store } from './store'
 import theme from './theme'
-import './index.css'
+import './styles/index.css'
 
 
 ReactDOM.render(
   <React.StrictMode>
 		<ThemeProvider theme={theme}>
-			{/* Сброс стилей */}
+			{/* Сброс стилей material-ui */}
 			<CssBaseline />
 			<Router>
 				<Provider store={store}>

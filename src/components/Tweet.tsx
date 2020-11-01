@@ -34,7 +34,7 @@ const useHomeStyles = makeStyles( theme => ({
 	}
 }))
 
-export const Tweet: React.FC<ITweet> = ({ user, text }: ITweet): React.ReactElement => {
+const Tweet: React.FC<ITweet> = ({ user, text, _id }: ITweet): React.ReactElement => {
 	const classes = useHomeStyles()
 
 	return (
@@ -78,3 +78,5 @@ export const Tweet: React.FC<ITweet> = ({ user, text }: ITweet): React.ReactElem
 		</Paper>
 	)
 }
+
+export default Tweet

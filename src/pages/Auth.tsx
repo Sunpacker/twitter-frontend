@@ -49,7 +49,7 @@ const useStyles = makeStyles( theme => ({
 	},
 }))
 
-export const Auth: React.FC = (): React.ReactElement => {
+const Auth: React.FC = (): React.ReactElement => {
 	const classes = useStyles()
 	
 	const [visibleModal, setVisibleModal] = React.useState<'signIn' | 'signUp'>()
@@ -148,3 +148,5 @@ export const Auth: React.FC = (): React.ReactElement => {
 		</div>
 	)
 }
+
+export default Auth

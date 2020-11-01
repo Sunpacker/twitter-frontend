@@ -4,9 +4,15 @@ export enum Status {
 	ERROR = 'ERROR',
 	NEVER = 'NEVER'
 }
+export enum FormStatus {
+	LOADING = 'LOADING',
+	ADDED = 'ADDED',
+	ERROR = 'ERROR',
+	NEVER = 'NEVER'
+}
 
 export interface ITweet {
-	_id?: string;
+	_id: string;
 	text: string;
 	user: {
 		fullname: string;
@@ -18,4 +24,5 @@ export interface ITweet {
 export interface ITweets {
 	items: ITweet[];
 	status: Status;
+	formStatus: FormStatus;
 }

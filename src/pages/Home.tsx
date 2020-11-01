@@ -1,7 +1,8 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link, Route } from 'react-router-dom'
 
-import { Button, Container, createStyles, Grid, IconButton, makeStyles, Paper, Typography, withStyles, Hidden, TextareaAutosize, CircularProgress, Avatar, List, ListItemAvatar, ListItem, ListItemText, TextField, ListSubheader } from '@material-ui/core'
+import { Container, createStyles, Grid, IconButton, makeStyles, Paper, Typography, withStyles, Hidden, CircularProgress, List, ListItem, ListItemText, TextField, ListSubheader } from '@material-ui/core'
 import { Theme } from '@material-ui/core/styles'
 import { 
 	Twitter as TwitterIcon, 
@@ -10,15 +11,22 @@ import {
 	EmailOutlined as EmailIcon,
 	BookmarkBorderOutlined as BookmarkIcon,
 	ListAltOutlined as ListIcon,
-	PermIdentityOutlined as UserIcon,
-	ImageOutlined as ImageOutlinedIcon,
-	EmojiEmotionsOutlined as EmojiIcon
+	PermIdentityOutlined as UserIcon
 } from '@material-ui/icons'
 
+import Tweet from '../components/Tweet'
+import BackButton from '../components/BackButton'
+import AddTweetForm from '../components/AddTweetForm'
+
 import { ITweet } from '../store/ducks/tweets/state'
-import { Tweet } from '../components/Tweet'
+import { ITag } from '../store/ducks/tags/state'
+
 import { fetchTweets } from '../store/ducks/tweets/actionCreators'
+import { fetchTags } from '../store/ducks/tags/actionCreators'
+
 import { selectIsTweetsLoading, selectTweets } from '../store/ducks/tweets/selectors'
+import { selectIsTagsLoading, selectTags } from '../store/ducks/tags/selectors'
+
 
 const useHomeStyles = makeStyles((theme: Theme) => ({
 	container: {
@@ -65,38 +73,15 @@ const useHomeStyles = makeStyles((theme: Theme) => ({
 		borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
 	},
 	pageTitle: {
-		zIndex: 1
-	},
-	tweetForm: {
 		display: 'flex',
-		flexDirection: 'column',
-		'& textarea': {
-			marginLeft: theme.spacing(1.5),
-			width: '100%',
-			height: '100%',
-			fontSize: 24,
-			fontFamily: 'Segoe UI',
-			border: 'none',
-			resize: 'none',
-			'&:focus': {
-				outline: 'none'
-			}
+		alignItems: 'center',
+		zIndex: 1,
+		'& h6': {
+			marginLeft: theme.spacing(1)
 		}
 	},
-	tweetFormText: {
-		display: 'flex',
-		marginBottom: theme.spacing(1.5)
-	},
-	tweetFormActions: {
-		display: 'flex',
-		alignItems: 'center'
-	},
-	tweetFormTextProgressBar: {
-		marginLeft: theme.spacing(.5),
-		marginRight: theme.spacing(2)
-	},
 	rightSide: {
-		paddingTop: 20,
+		paddingTop: 20
 	}
 }))
 
@@ -117,32 +102,39 @@ const SearchTextField = withStyles((theme: Theme) => createStyles({
 }))(TextField)
 
 
-export const Home: React.FC = (): React.ReactElement => {
+const Home: React.FC = (): React.ReactElement => {
 	const classes: any = useHomeStyles()
-	const [text, setText] = React.useState<string>('')
-	const textLength: number = text.length
-	const textLimit: number = 280
-	const textLimitPercentage: number = Math.round((text.length / textLimit) * 100)
-
-	const handleChangeText = (e: React.FormEvent<HTMLTextAreaElement>): void => e.currentTarget ? setText(e.currentTarget.value) : undefined
-	const handleAddTweet = (): void => setText('')
-
-	const tweets = useSelector(selectTweets).items
-	const isLoading = useSelector(selectIsTweetsLoading)
 	const dispatch = useDispatch()
 
+	const tweets = useSelector(selectTweets).items
+	const isTweetsLoading = useSelector(selectIsTweetsLoading)
+	
+	const tags = useSelector(selectTags).items
+	const isTagsLoading = useSelector(selectIsTagsLoading)
+
+	let [hash, setHash] = React.useState<string | undefined>(undefined)
+	const filterByHash = (value: string | undefined): void => setHash(value)
+
+	React.useEffect(() => {
+		const hashUrl: string = decodeURI(window.location.search.slice(3)) // hashtag without '?q='
+		setHash(hashUrl)
+	}, [])
 	React.useEffect(() => {
 		dispatch(fetchTweets())
+		dispatch(fetchTags())
 	}, [dispatch])
 
 	return (
 		<Container maxWidth="lg">
 			<Grid className={classes.container} container spacing={4}>
+				
 				<Grid item xs={1} lg={3}>
 					<ul className={`${classes.sticky} ${classes.sideMenuList}`}>
-						<IconButton color="primary">
-							<TwitterIcon style={{ fontSize: 36 }} />
-						</IconButton>
+						<Link to="/">
+							<IconButton color="primary">
+								<TwitterIcon style={{ fontSize: 36 }} />
+							</IconButton>
+						</Link>
 						<li>
 							<SearchIcon />
 							<Hidden smDown>
@@ -184,42 +176,29 @@ export const Home: React.FC = (): React.ReactElement => {
 
 				<Grid className={classes.feed} item xs={7} lg={6}>
 					<Paper variant="outlined" style={{ height: '100%' }} square>
+
 						<Paper className={`${classes.sticky} ${classes.block} ${classes.pageTitle}`} square>
-							<Typography variant="h6">Главная</Typography>
+							<Route path="/" exact>
+								<Typography variant="h6">Главная</Typography>
+							</Route>
+							<Route path="/search" exact>
+								<Typography variant="h6">#{hash}</Typography>
+							</Route>
+							<Route path="/tweet/:any" exact>
+								<BackButton />
+								<Typography variant="h6">Твитнуть</Typography>
+							</Route>
 						</Paper>
 
-						<Paper className={`${classes.block} ${classes.tweetForm}`}>
-							<div className={classes.tweetFormText}>
-								<Avatar src="https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg" />
-								<TextareaAutosize placeholder="Что происходит?" value={text} onChange={handleChangeText} />
-							</div>
-							<div className={classes.tweetFormActions}>
-								<IconButton color="primary">
-									<ImageOutlinedIcon />
-								</IconButton>
-								<IconButton color="primary" style={{ marginRight: 'auto' }}>
-									<EmojiIcon />
-								</IconButton>
-
-								{text && (
-									<>
-										<span>{`${textLength} / ${textLimit}`}</span>
-										<CircularProgress 
-											className={classes.tweetFormTextProgressBar} 
-											variant="static" 
-											size={20} thickness={5} 
-											value={textLength >= textLimit ? 100 : textLimitPercentage}
-											style={ textLength >= textLimit ? { color: 'red' } : undefined }
-										/>
-									</>
-								)}
-								<Button onClick={handleAddTweet} disabled={textLength >= textLimit} color="primary" variant="contained">Твитнуть</Button>
-							</div>
-						</Paper>
+						<Route className={classes.block} path={['/', '/search']} exact>
+							<AddTweetForm className={classes.block} />
+						</Route>
 						
-						{isLoading ? <CircularProgress /> : (
-							tweets.map( (tweet: ITweet) => <Tweet user={tweet.user} text={tweet.text} key={tweet._id} /> )
-						)}
+						<Route path="/" exact>
+							{ isTweetsLoading ? <CircularProgress /> : (
+								tweets.slice().reverse().map((tweet: ITweet) => <Tweet _id={tweet._id} key={tweet._id} user={tweet.user} text={tweet.text} />)
+							)}
+						</Route>
 					</Paper>
 				</Grid>
 
@@ -230,29 +209,33 @@ export const Home: React.FC = (): React.ReactElement => {
 							placeholder="Поиск в Твиттер"
 							fullWidth
 						/>
-						<List
-							subheader={
-								<ListSubheader component="div">
-									Кого читать
-								</ListSubheader>
-							}
-						>
-							<ListItem button divider>
-								<ListItemAvatar>
-									<Avatar src="https://i.playground.ru/p/lzF9n_oH7zjMPi6YYanG_A.jpeg" />
-								</ListItemAvatar>
-								<ListItemText 
-									primary="Dock of Shame"
-									secondary={
-										<Typography component="span" variant="body2">@FavDockOfShame</Typography>
-									}
-								/>
-							</ListItem>
-							<Typography>Показать еще</Typography>
-						</List>
+						{ isTagsLoading ? <CircularProgress /> : (
+							<List
+								subheader={
+									<ListSubheader component="div">
+										Актуальные темы
+									</ListSubheader>
+								}
+							>
+								{ tags.map((tag: ITag) => (
+									<Link key={tag._id} to={`/search?q=${tag.name}`} onClick={() => filterByHash(tag.name)}>
+										<ListItem button divider>
+											<ListItemText
+												primary={`#${tag.name}`}
+												secondary={
+													<Typography component="span" variant="body2">Твитов: {tag.count}</Typography>
+												}
+											/>
+										</ListItem>
+									</Link>
+								))}
+							</List>
+						)}
 					</div>
 				</Grid>
 			</Grid>
 		</Container>
 	)
 }
+
+export default Home
