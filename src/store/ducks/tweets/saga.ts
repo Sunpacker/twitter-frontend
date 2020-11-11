@@ -2,7 +2,7 @@ import { SagaIterator } from 'redux-saga'
 import { call, put, takeEvery } from 'redux-saga/effects'
 import { TweetsApi } from '../../../api/tweets'
 import { setTweets, setTweetsStatus, TweetActionsTypes, IAddTweetAction, pushTweet, setAddFormStatus } from './actionCreators'
-import { FormStatus, ITweet, Status } from './state'
+import { FormStatus, Status } from './state'
 
 export function* fetchTweets() {
    try {
@@ -12,18 +12,9 @@ export function* fetchTweets() {
 		 yield put(setTweetsStatus(Status.ERROR))
    }
 }
-export function* addTweet({ payload }: IAddTweetAction) {
+export function* addTweet({ payload: text }: IAddTweetAction) {
    try {
-		 const tweet: ITweet = {
-			 _id: '123',
-			 text: payload,
-			 user: {
-				 fullname: '123',
-				 username: '123',
-				 avatarUrl: '123'
-			 }
-		 }
-		 const data = yield call(TweetsApi.addTweet, tweet)
+		 const data = yield call(TweetsApi.addTweet, text)
 		 yield put(pushTweet(data))
    } catch (e) {
 		 yield put(setAddFormStatus(FormStatus.ERROR))

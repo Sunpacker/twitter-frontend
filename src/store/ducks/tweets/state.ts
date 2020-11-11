@@ -18,7 +18,9 @@ export interface ITweet {
 		fullname: string;
 		username: string;
 		avatarUrl: string;
-	}
+	};
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface ITweets {

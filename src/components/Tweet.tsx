@@ -8,6 +8,7 @@ import {
 } from '@material-ui/icons'
 import { grey } from '@material-ui/core/colors'
 import { ITweet } from '../store/ducks/tweets/state'
+import formatDate from '../plugins/formatDate'
 
 const useHomeStyles = makeStyles( theme => ({
 	block: {
@@ -34,7 +35,9 @@ const useHomeStyles = makeStyles( theme => ({
 	}
 }))
 
-const Tweet: React.FC<ITweet> = ({ user, text, _id }: ITweet): React.ReactElement => {
+
+
+const Tweet: React.FC<ITweet> = ({ _id, user, text, createdAt }): React.ReactElement => {
 	const classes = useHomeStyles()
 
 	return (
@@ -46,7 +49,7 @@ const Tweet: React.FC<ITweet> = ({ user, text, _id }: ITweet): React.ReactElemen
 				<Grid item xs={11}>
 					<Typography>
 						<b>{user.fullname}</b>
-						<span className={classes.tweetAuthor}>@{user.username} - 1ч.</span>
+						<span className={classes.tweetAuthor}>@{user.username} - {formatDate(new Date(createdAt))}</span>
 					</Typography>
 					<Typography variant="body1">{text}</Typography>
 				</Grid>

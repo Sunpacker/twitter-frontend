@@ -196,7 +196,16 @@ const Home: React.FC = (): React.ReactElement => {
 						
 						<Route path="/" exact>
 							{ isTweetsLoading ? <CircularProgress /> : (
-								tweets.slice().reverse().map((tweet: ITweet) => <Tweet _id={tweet._id} key={tweet._id} user={tweet.user} text={tweet.text} />)
+								tweets.map((tweet: ITweet) => (
+									<Tweet 
+										_id={tweet._id} 
+										key={tweet._id} 
+										user={tweet.user} 
+										text={tweet.text} 
+										createdAt={tweet.createdAt} 
+										updatedAt={tweet.updatedAt} 
+									/>
+								))
 							)}
 						</Route>
 					</Paper>
